@@ -3,10 +3,10 @@ package Calculadora;
 public class CalculadoraSalario {
 
     public Double calcular(Funcionario funcionario) {
-        if (funcionario == null || funcionario.getCargo() == null || funcionario.getSalarioBase() == null)
+        Double salarioBase = funcionario.getSalarioBase();
+        if (funcionario.getCargo() == null)
             return 0.0;
 
-        Double salarioBase = funcionario.getSalarioBase();
         CargoEnum cargo = funcionario.getCargo();
         return salarioBase * (salarioBase >= cargo.getLimite() ? cargo.getTaxaSuperior() : cargo.getTaxaInferior());
     }

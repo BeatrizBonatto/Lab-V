@@ -10,7 +10,7 @@ public class PersonDAO {
 
         // Nome: pelo menos 2 partes e só letras
         String[] nameParts = p.getName().trim().split("\\s+");
-        if (nameParts.length < 2 || !p.getName().matches("([A-Za-z]+\\s+){1,}[A-Za-z]+")) {
+        if (nameParts.length < 2 || !p.getName().matches("([\\p{L}]+\\s+){1,}[\\p{L}]+")) {
             errors.add("Nome inválido: deve conter ao menos duas partes e apenas letras.");
         }
 

@@ -9,88 +9,127 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PersonDAOTest {
 
-    private final PersonDAO dao = new PersonDAO();
+    private PersonDAO personDAO = new PersonDAO();
 
     @Test
-    public void testPessoaValida() {
-        List<Email> emails = List.of(new Email(1, "teste@email.com"));
-        Person p = new Person(1, "Joao Silva", 30, emails);
-        List<String> erros = dao.isValidToInclude(p);
-        assertTrue(erros.isEmpty());
+    public void testValidPerson() {
+        Person person = new Person();
+        person.setName("John Doe");
+        person.setAge(30);
+        person.setEmails(List.of(new Email(1,"john@example.com")));
+
+        List<String> errors = personDAO.isValidToInclude(person);
+        assertTrue(errors.isEmpty(), "Should have no errors for valid person");
     }
 
     @Test
-    public void testNomeInvalido() {
-        List<Email> emails = List.of(new Email(1, "teste@email.com"));
-        Person p = new Person(1, "Joao123", 30, emails);
-        List<String> erros = dao.isValidToInclude(p);
-        assertTrue(erros.stream().anyMatch(e -> e.contains("Nome inválido")));
+    public void testInvalidName_SinglePart() {
+        Person person = new Person();
+        person.setName("John");
+        person.setAge(30);
+        person.setEmails(List.of(new Email(1,"john@example.com")));
+
+        List<String> errors = personDAO.isValidToInclude(person);
+        assertFalse(errors.isEmpty(), "Should have errors for single-part name");
+        assertTrue(errors.contains("Nome inválido: deve conter ao menos duas partes e apenas letras."));
     }
 
     @Test
-    public void testIdadeInvalidaBaixa() {
-        Person p = new Person(1, "Joao Silva", 0, List.of(new Email(1, "teste@email.com")));
-        List<String> erros = dao.isValidToInclude(p);
-        assertTrue(erros.stream().anyMatch(e -> e.contains("Idade inválida")));
+    public void testInvalidName_WithNumbers() {
+        Person person = new Person();
+        person.setName("John Doe123");
+        person.setAge(30);
+        person.setEmails(List.of(new Email(1,"john@example.com")));
+
+        List<String> errors = personDAO.isValidToInclude(person);
+        assertFalse(errors.isEmpty(), "Should have errors for name with numbers");
+        assertTrue(errors.contains("Nome inválido: deve conter ao menos duas partes e apenas letras."));
     }
 
     @Test
-    public void testIdadeInvalidaAlta() {
-        Person p = new Person(1, "Joao Silva", 300, List.of(new Email(1, "teste@email.com")));
-        List<String> erros = dao.isValidToInclude(p);
-        assertTrue(erros.stream().anyMatch(e -> e.contains("Idade inválida")));
+    public void testInvalidName_Empty() {
+        Person person = new Person();
+        person.setName("");
+        person.setAge(30);
+        person.setEmails(List.of(new Email(1,"john@example.com")));
+
+        List<String> errors = personDAO.isValidToInclude(person);
+        assertFalse(errors.isEmpty(), "Should have errors for empty name");
+        assertTrue(errors.contains("Nome inválido: deve conter ao menos duas partes e apenas letras."));
     }
 
     @Test
-    public void testSemEmail() {
-        Person p = new Person(1, "Joao Silva", 30, new ArrayList<>());
-        List<String> erros = dao.isValidToInclude(p);
-        assertTrue(erros.stream().anyMatch(e -> e.contains("e-mail associado")));
+    public void testInvalidAge_TooLow() {
+        Person person = new Person();
+        person.setName("John Doe");
+        person.setAge(0);
+        person.setEmails(List.of(new Email(1,"john@example.com")));
+
+        List<String> errors = personDAO.isValidToInclude(person);
+        assertFalse(errors.isEmpty(), "Should have errors for age < 1");
+        assertTrue(errors.contains("Idade inválida: deve estar entre 1 e 200."));
     }
 
     @Test
-    public void testEmailInvalido() {
-        List<Email> emails = List.of(new Email(1, "emailinvalido"));
-        Person p = new Person(1, "Joao Silva", 30, emails);
-        List<String> erros = dao.isValidToInclude(p);
-        assertTrue(erros.stream().anyMatch(e -> e.contains("E-mail inválido")));
+    public void testInvalidAge_TooHigh() {
+        Person person = new Person();
+        person.setName("John Doe");
+        person.setAge(201);
+        person.setEmails(List.of(new Email(1,"john@example.com")));
+
+        List<String> errors = personDAO.isValidToInclude(person);
+        assertFalse(errors.isEmpty(), "Should have errors for age > 200");
+        assertTrue(errors.contains("Idade inválida: deve estar entre 1 e 200."));
     }
 
     @Test
-    public void testMultiplosErros() {
-        List<Email> emails = List.of(new Email(1, "semarroba"));
-        Person p = new Person(1, "Joao", -5, emails);
-        List<String> erros = dao.isValidToInclude(p);
-        assertEquals(3, erros.size());
+    public void testNoEmails() {
+        Person person = new Person();
+        person.setName("John Doe");
+        person.setAge(30);
+        person.setEmails(List.of());
+
+        List<String> errors = personDAO.isValidToInclude(person);
+        assertFalse(errors.isEmpty(), "Should have errors for no emails");
+        assertTrue(errors.contains("Deve haver ao menos um e-mail associado."));
     }
 
     @Test
-    public void testEmailsNull() {
-        Person p = new Person(1, "Joao", 25, null);
-        List<String> erros = dao.isValidToInclude(p);
-        assertFalse(erros.contains("Lista de emails não pode ser nula"));
+    public void testNullEmails() {
+        Person person = new Person();
+        person.setName("John Doe");
+        person.setAge(30);
+        person.setEmails(null);
+
+        List<String> errors = personDAO.isValidToInclude(person);
+        assertFalse(errors.isEmpty(), "Should have errors for null emails");
+        assertTrue(errors.contains("Deve haver ao menos um e-mail associado."));
     }
 
     @Test
-    public void testNomeComEspacosExtras() {
-        Person p = new Person(1, "Joao   Silva", 30, List.of(new Email(1, "teste@email.com")));
-        List<String> erros = dao.isValidToInclude(p);
-        assertTrue(erros.isEmpty());
+    public void testInvalidEmailFormat() {
+        Person person = new Person();
+        person.setName("John Doe");
+        person.setAge(30);
+        person.setEmails(List.of(new Email(1,"invalid-email")));
+
+        List<String> errors = personDAO.isValidToInclude(person);
+        assertFalse(errors.isEmpty(), "Should have errors for invalid email format");
+        assertTrue(errors.contains("E-mail inválido: invalid-email"));
     }
 
     @Test
-    public void testEmailSemPontoNoDominio() {
-        Person p = new Person(1, "Joao Silva", 30, List.of(new Email(1, "teste@email")));
-        List<String> erros = dao.isValidToInclude(p);
-        assertTrue(erros.stream().anyMatch(e -> e.contains("E-mail inválido")));
-    }
+    public void testMultipleErrors() {
+        Person person = new Person();
+        person.setName("John");
+        person.setAge(0);
+        person.setEmails(List.of(new Email(1,"invalid-email")));
 
-    @Test
-    public void testEmailsNulos() {
-        Person p = new Person(1, "Joao Silva", 30, null);
-        List<String> erros = dao.isValidToInclude(p);
-        assertTrue(erros.stream().anyMatch(e -> e.contains("e-mail associado")));
+        List<String> errors = personDAO.isValidToInclude(person);
+        assertEquals(3, errors.size(), "Should have 3 errors");
+        assertTrue(errors.contains("Nome inválido: deve conter ao menos duas partes e apenas letras."));
+        assertTrue(errors.contains("Idade inválida: deve estar entre 1 e 200."));
+        assertTrue(errors.contains("E-mail inválido: invalid-email"));
     }
-
 
 }
