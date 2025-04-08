@@ -102,4 +102,21 @@ public class TrianguloTest {
         assertFalse(t.formaTriangulo());
         assertEquals(TipoTriangulo.NAO_TRIANGULO, t.getTipo());
     }
+
+    @Test
+    public void testLadoBNulo() {
+        Triangulo t = new Triangulo(4, 0, 4);
+        assertFalse(t.formaTriangulo());
+        assertEquals(TipoTriangulo.NAO_TRIANGULO, t.getTipo());
+    }
+
+    @Test
+    public void testLadoCNulo() {
+        Triangulo t = new Triangulo(4, 4, 0);
+        assertFalse(t.formaTriangulo());
+        assertEquals(TipoTriangulo.NAO_TRIANGULO, t.getTipo());
+    }
+
+
+
 }

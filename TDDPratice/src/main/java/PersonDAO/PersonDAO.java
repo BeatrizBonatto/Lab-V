@@ -14,6 +14,7 @@ public class PersonDAO {
             errors.add("Nome inválido: deve conter ao menos duas partes e apenas letras.");
         }
 
+
         // Idade entre 1 e 200
         if (p.getAge() < 1 || p.getAge() > 200) {
             errors.add("Idade inválida: deve estar entre 1 e 200.");

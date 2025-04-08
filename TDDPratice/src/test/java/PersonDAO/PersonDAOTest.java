@@ -64,4 +64,33 @@ class PersonDAOTest {
         assertEquals(3, erros.size());
     }
 
+    @Test
+    public void testEmailsNull() {
+        Person p = new Person(1, "Joao", 25, null);
+        List<String> erros = dao.isValidToInclude(p);
+        assertFalse(erros.contains("Lista de emails não pode ser nula"));
+    }
+
+    @Test
+    public void testNomeComEspacosExtras() {
+        Person p = new Person(1, "Joao   Silva", 30, List.of(new Email(1, "teste@email.com")));
+        List<String> erros = dao.isValidToInclude(p);
+        assertTrue(erros.isEmpty());
+    }
+
+    @Test
+    public void testEmailSemPontoNoDominio() {
+        Person p = new Person(1, "Joao Silva", 30, List.of(new Email(1, "teste@email")));
+        List<String> erros = dao.isValidToInclude(p);
+        assertTrue(erros.stream().anyMatch(e -> e.contains("E-mail inválido")));
+    }
+
+    @Test
+    public void testEmailsNulos() {
+        Person p = new Person(1, "Joao Silva", 30, null);
+        List<String> erros = dao.isValidToInclude(p);
+        assertTrue(erros.stream().anyMatch(e -> e.contains("e-mail associado")));
+    }
+
+
 }

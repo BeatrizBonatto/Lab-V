@@ -45,7 +45,8 @@ public class CalculadoraSalarioTest {
                 Arguments.of("Nome 9", "nome9@lp2.com", 2000.01, CargoEnum.DBA, 1500.0075),
                 Arguments.of("Nome 10", "nome10@lp2.com", 4999.99, CargoEnum.GERENTE, 3999.992),
                 Arguments.of("Nome 11", "nome11@lp2.com", 2000.01, CargoEnum.TESTADOR, 1500.0075),
-                Arguments.of("Nome 12", "nome12@lp2.com", 0.0, null, 0.0)
-                );
+                Arguments.of("Nome 12", "nome12@lp2.com", 0.0, null, 0.0),
+                Arguments.of(null, 0.0)
+        );
     }
 }
